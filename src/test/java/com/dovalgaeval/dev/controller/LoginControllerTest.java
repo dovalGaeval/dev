@@ -1,5 +1,6 @@
 package com.dovalgaeval.dev.controller;
 
+import com.dovalgaeval.dev.domain.Member;
 import com.dovalgaeval.dev.repository.MemberRepository;
 import com.dovalgaeval.dev.request.MemberCreate;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,8 +39,35 @@ class LoginControllerTest {
     }
 
     @Test
-    @DisplayName("/register 시 userName은 필수다.")
+    @DisplayName("회원가입")
     void postRegister() throws Exception {
+        //given
+        MemberCreate requestMember = MemberCreate.builder()
+                .userName("이메일")
+                .password("1234")
+                .build();
+
+        String json = objectMapper.writeValueAsString(requestMember);
+
+        //when
+        mockMvc.perform(post("/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                )
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        //then
+        assertEquals(1L,memberRepository.count());
+
+        Member member = memberRepository.findAll().get(0);
+        assertEquals("이메일",member.getUserName());
+
+    }
+
+    @Test
+    @DisplayName("회원가입시 userName은 필수입니다.")
+    void titleValidation() throws Exception {
         //given
         MemberCreate requestMember = MemberCreate.builder()
                 .password("1234")
@@ -47,12 +75,13 @@ class LoginControllerTest {
 
         String json = objectMapper.writeValueAsString(requestMember);
 
-        //expected
+        //when
         mockMvc.perform(post("/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
                 )
                 .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
                 .andDo(print());
 
     }
