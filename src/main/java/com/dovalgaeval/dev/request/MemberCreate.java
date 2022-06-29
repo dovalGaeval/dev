@@ -2,7 +2,6 @@ package com.dovalgaeval.dev.request;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 
 import javax.validation.constraints.NotBlank;
 
