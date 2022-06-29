@@ -1,7 +1,6 @@
 package com.dovalgaeval.dev.service;
 
 import com.dovalgaeval.dev.config.Encrypt;
-import com.dovalgaeval.dev.config.Salt;
 import com.dovalgaeval.dev.domain.Member;
 import com.dovalgaeval.dev.repository.MemberRepository;
 import com.dovalgaeval.dev.request.MemberCreate;
@@ -18,12 +17,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class MemberService {
-
     private final MemberRepository memberRepository;
-
     private final Encrypt encrypt;
-
-    private final Salt salt;
 
     /**
      *
@@ -32,11 +27,9 @@ public class MemberService {
      * @param memberCreate
      */
     public void save(MemberCreate memberCreate){
-        String rawSalt = salt.getSalt();
         Member member = Member.builder()
-                .userName(encrypt.getEncrypt(memberCreate.getUserName()))
-                .password(encrypt.getEncrypt(memberCreate.getPassword()+rawSalt))
-                .salt(encrypt.getEncrypt(rawSalt))
+                .userName(encrypt.encryptAES256(memberCreate.getUserName())) //userName 암호화하기
+                .password(memberCreate.getPassword())
                 .build();
         memberRepository.save(member);
     }

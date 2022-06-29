@@ -1,5 +1,6 @@
 package com.dovalgaeval.dev.controller;
 
+import com.dovalgaeval.dev.config.Encrypt;
 import com.dovalgaeval.dev.domain.Member;
 import com.dovalgaeval.dev.repository.MemberRepository;
 import com.dovalgaeval.dev.request.MemberCreate;
@@ -12,7 +13,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -32,6 +32,9 @@ class LoginControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private Encrypt encrypt;
 
     @BeforeEach
     void clean(){
@@ -61,7 +64,7 @@ class LoginControllerTest {
         assertEquals(1L,memberRepository.count());
 
         Member member = memberRepository.findAll().get(0);
-        assertEquals("이메일",member.getUserName());
+        assertEquals("이메일",encrypt.decryptAES256(member.getUserName()));
 
     }
 

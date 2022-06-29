@@ -1,8 +1,6 @@
 package com.dovalgaeval.dev.service;
 
 import com.dovalgaeval.dev.config.Encrypt;
-import com.dovalgaeval.dev.config.Salt;
-import com.dovalgaeval.dev.domain.Member;
 import com.dovalgaeval.dev.repository.MemberRepository;
 import com.dovalgaeval.dev.request.MemberCreate;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,16 +41,16 @@ class MemberServiceTest {
         memberService.save(member);
 
         //then
-        assertEquals(memberRepository.findAll().get(0).getUserName(),member.getUserName());
+        assertEquals(encrypt.decryptAES256(memberRepository.findAll().get(0).getUserName()),member.getUserName());
 
     }
 
     @Test
-    @DisplayName("Member userName 암호화 테스트")
+    @DisplayName("Member userName 암호화, 복호화 테스트")
     void encrypt(){
         //given
         MemberCreate memberCreate = MemberCreate.builder()
-                .userName("이메일")
+                .userName("이메일") //userName 암호화
                 .password("1234")
                 .build();
 
@@ -60,8 +58,9 @@ class MemberServiceTest {
         memberService.save(memberCreate);
 
         //then
-        assertEquals(memberRepository.findAll().get(0).getUserName()
-                ,encrypt.getEncrypt(memberCreate.getUserName()));
+        assertEquals(encrypt.decryptAES256(memberRepository.findAll().get(0).getUserName())
+                ,memberCreate.getUserName());
+
 
     }
 }

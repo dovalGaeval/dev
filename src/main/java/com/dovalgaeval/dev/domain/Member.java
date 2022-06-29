@@ -1,6 +1,5 @@
 package com.dovalgaeval.dev.domain;
 
-import com.dovalgaeval.dev.config.Encrypt;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,13 +28,10 @@ public class Member {
     private String userName;
     private String password;
 
-    private String salt;
-
     @Builder
-    public Member(String userName, String password, String salt) {
+    public Member(String userName, String password) {
         this.userName = userName;
         this.password = password;
-        this.salt = salt;
     }
 
 }

@@ -2,7 +2,6 @@ package com.dovalgaeval.dev.controller;
 
 import com.dovalgaeval.dev.exception.GlobalException;
 import com.dovalgaeval.dev.response.ErrorResponse;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -38,6 +37,21 @@ public class ExceptionController {
         }
 
         return response;
+    }
+
+    @ResponseBody
+    @ExceptionHandler(GlobalException.class)
+    public ResponseEntity<ErrorResponse> globalException(GlobalException e){
+        int statusCode = e.getStatusCode();
+
+        ErrorResponse body = ErrorResponse.builder()
+                .code(String.valueOf(statusCode))
+                .message(e.getMessage())
+                .validation(e.getValidation())
+                .build();
+
+        ResponseEntity<ErrorResponse> responseEntity = ResponseEntity.status(statusCode).body(body);
+        return responseEntity;
     }
 
 }
