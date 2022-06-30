@@ -1,14 +1,12 @@
 package com.dovalgaeval.dev.domain;
 
+import com.dovalgaeval.dev.Role;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 /**
 *
@@ -16,6 +14,7 @@ import javax.persistence.Id;
 *
 * @author LJH
 * 작성일 2022-06-27
+* 수정일 2022-06-30 role 추가
 **/
 @Entity
 @Getter
@@ -28,10 +27,14 @@ public class Member {
     private String userName;
     private String password;
 
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     @Builder
-    public Member(String userName, String password) {
+    public Member(String userName, String password,Role role) {
         this.userName = userName;
         this.password = password;
+        this.role = role;
     }
 
 }

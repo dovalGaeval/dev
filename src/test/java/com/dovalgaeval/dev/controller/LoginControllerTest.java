@@ -1,6 +1,6 @@
 package com.dovalgaeval.dev.controller;
 
-import com.dovalgaeval.dev.config.Encrypt;
+import com.dovalgaeval.dev.component.Encrypt;
 import com.dovalgaeval.dev.domain.Member;
 import com.dovalgaeval.dev.repository.MemberRepository;
 import com.dovalgaeval.dev.request.MemberCreate;
@@ -12,8 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.anonymous;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -42,6 +45,7 @@ class LoginControllerTest {
     }
 
     @Test
+    @WithAnonymousUser //security 적용후 테스트를 하기 위해서 익명의 사용자를 만들어줘야함
     @DisplayName("회원가입")
     void postRegister() throws Exception {
         //given
@@ -69,6 +73,7 @@ class LoginControllerTest {
     }
 
     @Test
+    @WithAnonymousUser //security 적용후 테스트를 하기 위해서 익명의 사용자를 만들어줘야함
     @DisplayName("회원가입시 userName은 필수입니다.")
     void titleValidation() throws Exception {
         //given

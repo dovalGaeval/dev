@@ -1,6 +1,6 @@
 package com.dovalgaeval.dev.service;
 
-import com.dovalgaeval.dev.config.Encrypt;
+import com.dovalgaeval.dev.component.Encrypt;
 import com.dovalgaeval.dev.repository.MemberRepository;
 import com.dovalgaeval.dev.request.MemberCreate;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,8 +8,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 class MemberServiceTest {
@@ -22,6 +24,9 @@ class MemberServiceTest {
 
     @Autowired
     private Encrypt encrypt;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void clean(){
@@ -60,6 +65,27 @@ class MemberServiceTest {
         //then
         assertEquals(encrypt.decryptAES256(memberRepository.findAll().get(0).getUserName())
                 ,memberCreate.getUserName());
+
+
+    }
+
+    @Test
+    @DisplayName("Member password 암호화 테스트")
+    void encryptPassword(){
+        //given
+        MemberCreate memberCreate = MemberCreate.builder()
+                .userName("이메일")
+                .password("1234")
+                .build();
+
+        //when
+        memberService.save(memberCreate);
+
+        //then
+        assertEquals(encrypt.decryptAES256(memberRepository.findAll().get(0).getUserName())
+                ,memberCreate.getUserName());
+
+        assertThat(passwordEncoder.matches(memberCreate.getPassword(),memberRepository.findAll().get(0).getPassword())).isEqualTo(true);
 
 
     }

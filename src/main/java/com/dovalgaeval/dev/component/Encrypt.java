@@ -1,4 +1,4 @@
-package com.dovalgaeval.dev.config;
+package com.dovalgaeval.dev.component;
 
 import com.dovalgaeval.dev.exception.InvalidRequest;
 import org.springframework.beans.factory.annotation.Value;
