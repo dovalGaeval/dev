@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -36,7 +37,8 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         //authorizeRequests는 HttpServletRequest에 따라 접근을 제한한다. permitAll 누구나 접근가능하다.
         http.csrf().disable() //token을 사용하는 방식이기 때문에 csrf는 disable
-                .authorizeRequests().antMatchers("/","/register").permitAll() //로그인, 회원가입 페이지는 누구나 접근가능
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) //session
+                .and().authorizeRequests().antMatchers("/","/register").permitAll() //로그인, 회원가입 페이지는 누구나 접근가능
                 .and().formLogin() //spring Security에서 제공하는 로그인화면을 사용하겠다.
                 .loginPage("/")//spring Security에서 제공하는 로그인화면을 사용하지 않을 경우 사용
                 .usernameParameter("userName")
