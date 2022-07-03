@@ -4,6 +4,7 @@ import com.dovalgaeval.dev.component.Encrypt;
 import com.dovalgaeval.dev.domain.Member;
 import com.dovalgaeval.dev.repository.MemberRepository;
 import com.dovalgaeval.dev.request.MemberCreate;
+import com.dovalgaeval.dev.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,8 +16,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.anonymous;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -32,6 +31,9 @@ class LoginControllerTest {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private MemberService memberService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -56,7 +58,7 @@ class LoginControllerTest {
 
         String json = objectMapper.writeValueAsString(requestMember);
 
-        //when
+        //expected
         mockMvc.perform(post("/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
@@ -64,11 +66,11 @@ class LoginControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print());
 
-        //then
+
         assertEquals(1L,memberRepository.count());
 
         Member member = memberRepository.findAll().get(0);
-        assertEquals("이메일",encrypt.decryptAES256(member.getUserName()));
+        assertEquals("이메일",encrypt.decryptAES256(member.getUsername()));
 
     }
 
@@ -83,7 +85,7 @@ class LoginControllerTest {
 
         String json = objectMapper.writeValueAsString(requestMember);
 
-        //when
+        //expected
         mockMvc.perform(post("/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
@@ -91,6 +93,22 @@ class LoginControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("400"))
                 .andDo(print());
+
+    }
+
+    @Test
+    @WithAnonymousUser
+    @DisplayName("로그인")
+    void login(){
+        //given
+        MemberCreate requestMember = MemberCreate.builder()
+                .userName("이메일")
+                .password("1234")
+                .build();
+
+        memberService.save(requestMember); //회원가입
+
+        //expected
 
     }
 }

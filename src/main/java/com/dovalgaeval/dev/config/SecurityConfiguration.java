@@ -1,13 +1,17 @@
 package com.dovalgaeval.dev.config;
 
+import com.dovalgaeval.dev.component.JwtTokenProvider;
+import com.dovalgaeval.dev.filter.JwtAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
 *
@@ -17,7 +21,12 @@ import org.springframework.security.web.SecurityFilterChain;
 * 작성일 2022-06-30
 **/
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfiguration {
+
+    public JwtAuthenticationFilter jwtAuthenticationFilter(){
+        return new JwtAuthenticationFilter();
+    }
 
     /**
      * passwordEncoder password 암호화
@@ -36,14 +45,26 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         //authorizeRequests는 HttpServletRequest에 따라 접근을 제한한다. permitAll 누구나 접근가능하다.
-        http.csrf().disable() //token을 사용하는 방식이기 때문에 csrf는 disable
+        http.cors().and()
+                .csrf().disable() //token을 사용하는 방식이기 때문에 csrf는 disable
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) //session
-                .and().authorizeRequests().antMatchers("/","/register").permitAll() //로그인, 회원가입 페이지는 누구나 접근가능
+                .and()
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .authorizeRequests()
+//                .antMatchers("/**").permitAll()
+                .and().authorizeRequests().antMatchers("/register","/","/h2-console/**").permitAll()
+                .anyRequest().authenticated()
                 .and().formLogin() //spring Security에서 제공하는 로그인화면을 사용하겠다.
                 .loginPage("/")//spring Security에서 제공하는 로그인화면을 사용하지 않을 경우 사용
+                .loginProcessingUrl("/login")
                 .usernameParameter("userName")
                 .permitAll()
-                .and().logout().permitAll();
+                .and().logout().permitAll()
+//                .and()
+//                .exceptionHandling()
+//                .authenticationEntryPoint() //인증 예외발생했을때 어떻게 처리할지를 결정
+                ;
+
 
         http.headers().frameOptions().sameOrigin();
         return http.build();
