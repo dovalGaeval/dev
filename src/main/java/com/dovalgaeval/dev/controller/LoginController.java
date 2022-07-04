@@ -1,16 +1,11 @@
 package com.dovalgaeval.dev.controller;
 
-import com.dovalgaeval.dev.Role;
-import com.dovalgaeval.dev.domain.Member;
 import com.dovalgaeval.dev.request.MemberCreate;
 import com.dovalgaeval.dev.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,8 +27,6 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class LoginController {
     private final MemberService memberService;
-
-
 
     /**
      *
@@ -74,9 +67,8 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody @Valid MemberCreate request, HttpServletResponse response){
+    public void login(@RequestBody @Valid MemberCreate request, HttpServletResponse response){
         String jwt = memberService.login(request);
-        response.setHeader("Authorization","Bearer "+ jwt);
-        return ResponseEntity.ok(response);
+        response.setHeader("Authorization","Bearer " + jwt);
     }
 }

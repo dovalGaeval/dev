@@ -2,9 +2,14 @@ package com.dovalgaeval.dev.config;
 
 import com.dovalgaeval.dev.component.JwtTokenProvider;
 import com.dovalgaeval.dev.filter.JwtAuthenticationFilter;
+import com.dovalgaeval.dev.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -24,8 +29,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 
-    public JwtAuthenticationFilter jwtAuthenticationFilter(){
-        return new JwtAuthenticationFilter();
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
     /**
@@ -36,6 +42,8 @@ public class SecurityConfiguration {
         return new BCryptPasswordEncoder();
     }
 
+    private final JwtTokenProvider jwtTokenProvider;
+
     /**
      *
      * filterChain springsecurity의 전반적인 설정
@@ -44,19 +52,18 @@ public class SecurityConfiguration {
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+
         //authorizeRequests는 HttpServletRequest에 따라 접근을 제한한다. permitAll 누구나 접근가능하다.
         http.cors().and()
                 .csrf().disable() //token을 사용하는 방식이기 때문에 csrf는 disable
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) //session
                 .and()
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
 //                .antMatchers("/**").permitAll()
-                .and().authorizeRequests().antMatchers("/register","/","/h2-console/**").permitAll()
+                .and().authorizeRequests().antMatchers("/register","/","/h2-console/**","/signIn*").permitAll()
                 .anyRequest().authenticated()
                 .and().formLogin() //spring Security에서 제공하는 로그인화면을 사용하겠다.
                 .loginPage("/")//spring Security에서 제공하는 로그인화면을 사용하지 않을 경우 사용
-                .loginProcessingUrl("/login")
                 .usernameParameter("userName")
                 .permitAll()
                 .and().logout().permitAll()
@@ -65,8 +72,8 @@ public class SecurityConfiguration {
 //                .authenticationEntryPoint() //인증 예외발생했을때 어떻게 처리할지를 결정
                 ;
 
-
-        http.headers().frameOptions().sameOrigin();
+        http.apply(new JwtSecurityConfig(jwtTokenProvider));
+//        http.headers().frameOptions().sameOrigin();
         return http.build();
     }
 

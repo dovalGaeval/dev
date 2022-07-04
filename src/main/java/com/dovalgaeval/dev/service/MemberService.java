@@ -1,6 +1,6 @@
 package com.dovalgaeval.dev.service;
 
-import com.dovalgaeval.dev.Role;
+import com.dovalgaeval.dev.domain.Role;
 import com.dovalgaeval.dev.component.Encrypt;
 import com.dovalgaeval.dev.component.JwtTokenProvider;
 import com.dovalgaeval.dev.domain.Member;
@@ -8,7 +8,6 @@ import com.dovalgaeval.dev.repository.MemberRepository;
 import com.dovalgaeval.dev.request.MemberCreate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -16,8 +15,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import javax.servlet.http.HttpServletResponse;
 
 /**
 *
@@ -35,7 +32,7 @@ public class MemberService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
-    
+
     /**
      *
      * save 회원저장
@@ -46,6 +43,7 @@ public class MemberService implements UserDetailsService {
         Member member = Member.builder()
                 .userName(encrypt.encryptAES256(memberCreate.getUserName())) //userName 암호화하기
                 .password(passwordEncoder.encode(memberCreate.getPassword())) //비밀번호 암호화하기
+                .role(Role.ROLE_USER)
                 .build();
         memberRepository.save(member);
     }

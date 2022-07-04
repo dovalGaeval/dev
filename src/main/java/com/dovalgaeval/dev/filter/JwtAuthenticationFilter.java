@@ -27,9 +27,15 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private JwtTokenProvider jwtTokenProvider(){
-        return new JwtTokenProvider();
+    private JwtTokenProvider jwtTokenProvider;
+
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider){
+        this.jwtTokenProvider = jwtTokenProvider;
     }
+
+//    private JwtTokenProvider jwtTokenProvider(){
+//        return new JwtTokenProvider();
+//    }
 
     /**
      *
@@ -40,9 +46,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try{
-            String jwt = jwtTokenProvider().getJwtFromRequest(request); //header로부터 bearer 토큰을 가져옴
-            if(StringUtils.isNotEmpty(jwt) && jwtTokenProvider().validateToken(jwt)){ //token 체크
-                Authentication authentication = jwtTokenProvider().getUserIdFromJWT(jwt);
+            String jwt = jwtTokenProvider.getJwtFromRequest(request); //header로부터 bearer 토큰을 가져옴
+            if(StringUtils.isNotEmpty(jwt) && jwtTokenProvider.validateToken(jwt)){ //token 체크
+                Authentication authentication = jwtTokenProvider.getUserIdFromJWT(jwt);
 
                 //정상 토큰이면 토큰을 통해 생성한 Authentication 객체를 SecurityContext에 저장
                 SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -51,7 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     request.setAttribute("unauthorization","401 인증키 없음");
                 }
 
-                if(jwtTokenProvider().validateToken(jwt)){
+                if(jwtTokenProvider.validateToken(jwt)){
                     request.setAttribute("unauthorization","401-011 인증키 만료");
                 }
             }

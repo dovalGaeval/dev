@@ -1,4 +1,4 @@
-package com.dovalgaeval.dev;
+package com.dovalgaeval.dev.domain;
 
 public enum Role {
     ROLE_USER,
