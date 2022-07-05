@@ -4,8 +4,10 @@ import com.dovalgaeval.dev.component.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -29,13 +31,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private JwtTokenProvider jwtTokenProvider;
 
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider){
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
     }
-
-//    private JwtTokenProvider jwtTokenProvider(){
-//        return new JwtTokenProvider();
-//    }
 
     /**
      *
@@ -48,10 +46,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try{
             String jwt = jwtTokenProvider.getJwtFromRequest(request); //header로부터 bearer 토큰을 가져옴
             if(StringUtils.isNotEmpty(jwt) && jwtTokenProvider.validateToken(jwt)){ //token 체크
-                Authentication authentication = jwtTokenProvider.getUserIdFromJWT(jwt);
+                String userName = jwtTokenProvider.getUserIdFromJWT(jwt);
+
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userName, null, null);
+
+                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 //정상 토큰이면 토큰을 통해 생성한 Authentication 객체를 SecurityContext에 저장
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }else{
                 if(StringUtils.isEmpty(jwt)){
                     request.setAttribute("unauthorization","401 인증키 없음");

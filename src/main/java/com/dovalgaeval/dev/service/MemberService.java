@@ -30,8 +30,11 @@ public class MemberService implements UserDetailsService {
     private final MemberRepository memberRepository;
     private final Encrypt encrypt;
     private final PasswordEncoder passwordEncoder;
+
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
+
     private final JwtTokenProvider jwtTokenProvider;
+
 
     /**
      *
@@ -64,11 +67,11 @@ public class MemberService implements UserDetailsService {
                 .password(member.getPassword())
                 .role(Role.ROLE_USER).build();
     }
-    
+
     public String login(MemberCreate request){
         log.info("memberService login 시작");
         Member member = loadUserByUsername(request.getUserName());
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(request.getUserName(), null, null);
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword(), null);
         log.info("token : " ,token);
 
         Authentication authenticate = authenticationManagerBuilder.getObject().authenticate(token);
@@ -77,5 +80,5 @@ public class MemberService implements UserDetailsService {
 
         return jwt;
     }
-
+    
 }

@@ -1,13 +1,9 @@
 package com.dovalgaeval.dev.component;
 
-import com.dovalgaeval.dev.domain.Member;
-import com.dovalgaeval.dev.service.MemberService;
 import io.jsonwebtoken.*;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -23,16 +19,14 @@ import java.util.Date;
 **/
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class JwtTokenProvider {
 
-    @Value("jwt.key")
+    @Value("${jwt.key}")
     private String jwtKey;
 
-    @Value("jwt.effective.time")
-    private String jwtEffectiveTime;
+    @Value("${jwt.effective.time}")
+    private int jwtEffectiveTime;
 
-    private MemberService memberService;
     /**
      *
      * validateToken token 검증
@@ -45,13 +39,13 @@ public class JwtTokenProvider {
             Jwts.parser().setSigningKey(jwtKey).parseClaimsJws(token);
             return true;
         }catch (SignatureException e){
-            log.error("Invalid JWT signature");
+            log.error("Invalid JWT signature","잘못된 jwt 서명");
         }catch (MalformedJwtException e){
-            log.error("Invalid JWT token");
+            log.error("Invalid JWT token", "잘못된 jwt 토큰");
         }catch (ExpiredJwtException e){
-            log.error("Expried JWT token");
+            log.error("Expired JWT token","만료된 jwt 토큰");
         }catch (UnsupportedJwtException e){
-            log.error("Unsupported JWT token");
+            log.error("Unsupported JWT token","지원되지 않는 jwt 토큰");
         }catch (IllegalArgumentException e){
             log.error("JWT claims string is empty");
         }
@@ -69,7 +63,8 @@ public class JwtTokenProvider {
      */
     public String createToken(Authentication authentication){
         Date now = new Date();
-        Date expireDate = new Date(now.getTime() + Integer.parseInt(jwtEffectiveTime));
+
+        Date expireDate = new Date(now.getTime() + jwtEffectiveTime);
 
         return Jwts.builder()
                 .setSubject(String.valueOf(authentication.getPrincipal())) //authentication.getPrincipal -> ID
@@ -86,12 +81,11 @@ public class JwtTokenProvider {
      * @param token
      * @return userName
      */
-    public Authentication getUserIdFromJWT(String token) {
-        String userName = Jwts.parser().setSigningKey(jwtKey).parseClaimsJws(token).getBody().getSubject();
+    public String getUserIdFromJWT(String token) {
 
-        Member member = memberService.loadUserByUsername(userName);
+        Claims claims = Jwts.parser().setSigningKey(jwtKey).parseClaimsJws(token).getBody();
 
-        return new UsernamePasswordAuthenticationToken(member.getUsername(),null,member.getAuthorities());
+        return claims.getSubject();
 
     }
 
