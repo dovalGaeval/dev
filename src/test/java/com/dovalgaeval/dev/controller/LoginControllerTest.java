@@ -113,7 +113,6 @@ class LoginControllerTest {
                         .content(json)
                 )
                 .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.code").value("400"))
                 .andDo(print());
 
     }
@@ -142,7 +141,7 @@ class LoginControllerTest {
                         .content(json)
                 )
                 .andExpect(status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/"))
+                .andExpect(redirectedUrl("/"))
                 .andDo(print());
 
     }

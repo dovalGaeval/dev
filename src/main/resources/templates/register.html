@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <meta charset="utf-8">
@@ -63,8 +63,8 @@
                     <p class="text-center small">Enter your personal details to create account</p>
                   </div>
 
-                  //로그인 폼
-                  <form class="row g-3 needs-validation" novalidate>
+                  <!-- 회원가입 폼 -->
+                  <form class="row g-3 needs-validation" novalidate id="registerForm">
 <!--                    <div class="col-12">-->
 <!--                      <label for="yourName" class="form-label">Your Name</label>-->
 <!--                      <input type="text" name="name" class="form-control" id="yourName" required>-->
@@ -87,20 +87,13 @@
 <!--                    </div>-->
 
                     <div class="col-12">
-                      <label for="yourPassword" class="form-label">Password</label>
-                      <input type="password" name="password" class="form-control" id="yourPassword" required>
+                      <label for="password" class="form-label">Password</label>
+                      <input type="password" name="password" class="form-control" id="password" required>
                       <div class="invalid-feedback">Please enter your password!</div>
                     </div>
 
                     <div class="col-12">
-                      <div class="form-check">
-                        <input class="form-check-input" name="terms" type="checkbox" value="" id="acceptTerms" required>
-                        <label class="form-check-label" for="acceptTerms">I agree and accept the <a href="#">terms and conditions</a></label>
-                        <div class="invalid-feedback">You must agree before submitting.</div>
-                      </div>
-                    </div>
-                    <div class="col-12">
-                      <button class="btn btn-primary w-100" type="submit">Create Account</button>
+                      <button class="btn btn-primary w-100" id="submitId">Create Account</button>
                     </div>
                     <div class="col-12">
                       <p class="small mb-0">Already have an account? <a href="/">Log in</a></p>
@@ -136,6 +129,31 @@
   <script src="/vendor/tinymce/tinymce.min.js"></script>
   <!-- Template Main JS File -->
   <script src="/js/main.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+  <script th:inline="javascript">
+      $("#submitId").on("click",function(){
+
+         var data = {
+                "userName" : $("#userName").val(),
+                "password" : $("#password").val()
+         };
+
+          $.ajax({
+            url: "/registerMember",
+            type: "post",
+            contentType: "application/json; charset=utf-8",
+<!--            data : JSON.stringify(data),-->
+            success : function(data){
+                alert("회원가입 성공");
+            },
+            error : function(e,status){
+                console.log(e + " : " + status);
+            }
+          });
+        })
+  </script>
 
 </body>
 

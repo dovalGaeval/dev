@@ -61,12 +61,13 @@ public class SecurityConfiguration {
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) //session
             .and().addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class) //UsernamePasswordAuthenticationFilter 전에 jwt인증을 먼저 하겠다는 의미
             .authorizeRequests()
-            .and().authorizeRequests().antMatchers("/register","/","/h2-console/**","/login").permitAll()
+            .and().authorizeRequests().antMatchers("/","/h2-console/**","/login","/register","/registerMember").permitAll()
             .anyRequest().authenticated()
             .and().formLogin() //spring Security에서 제공하는 로그인화면을 사용하겠다.
             .loginPage("/")//spring Security에서 제공하는 로그인화면을 사용하지 않을 경우 사용
             .usernameParameter("userName") //spring Security에서는 파라미터로 username을 사용하는데 변경하고 싶을 때 사용
             .permitAll()
+                .defaultSuccessUrl("/boardList")
             .and().logout().permitAll()
             .and()
             .exceptionHandling()
@@ -80,7 +81,7 @@ public class SecurityConfiguration {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer(){
-        return (web) -> web.ignoring().antMatchers("/img/**","/css/**","/js/**","/vendeor/**");
+        return (web) -> web.ignoring().antMatchers("/img/**","/css/**","/js/**","/vendor/**");
         //resources/static에 있는 파일들을 무시한다는 설정
     }
 

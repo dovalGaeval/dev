@@ -3,6 +3,7 @@ package com.dovalgaeval.dev.controller;
 import com.dovalgaeval.dev.request.MemberCreate;
 import com.dovalgaeval.dev.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,6 +21,7 @@ import javax.validation.Valid;
 * @author LJH
 * 작성일 2022-06-26
 **/
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class LoginController {
@@ -55,12 +57,14 @@ public class LoginController {
      *
      * postRegister 회원가입
      *
-     * @param request,mv
+     * @param mv
      */
-    @PostMapping("/register")
-    public void postRegister(@RequestBody @Valid MemberCreate request,ModelAndView mv){
+    @PostMapping("/registerMember")
+    public ModelAndView postRegister(@RequestBody @Valid MemberCreate request,ModelAndView mv){
         memberService.save(request);
+        log.info("registerMember");
         mv.setViewName("login");
+        return mv;
     }
 
     @PostMapping("/login")
