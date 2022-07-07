@@ -15,6 +15,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 /**
 *
@@ -56,12 +61,13 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
 
         //authorizeRequests는 HttpServletRequest에 따라 접근을 제한한다. permitAll 누구나 접근가능하다.
-        http
+        http.httpBasic().disable() // http basic Authentication은 security에서 제공해주는 default configuration이 아니다
+                .cors().disable()
             .csrf().disable() //token을 사용하는 방식이기 때문에 csrf는 disable
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) //session
             .and().addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class) //UsernamePasswordAuthenticationFilter 전에 jwt인증을 먼저 하겠다는 의미
             .authorizeRequests()
-            .and().authorizeRequests().antMatchers("/","/h2-console/**","/login","/register","/registerMember").permitAll()
+            .and().authorizeRequests().antMatchers("/","/h2-console/**","/login","/register").permitAll()
             .anyRequest().authenticated()
             .and().formLogin() //spring Security에서 제공하는 로그인화면을 사용하겠다.
             .loginPage("/")//spring Security에서 제공하는 로그인화면을 사용하지 않을 경우 사용
@@ -85,4 +91,16 @@ public class SecurityConfiguration {
         //resources/static에 있는 파일들을 무시한다는 설정
     }
 
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource(){
+        //요청 전 쿠키가 포함되지 않기 때문에 cors는 spring security보다 먼저 처리되어야 한다.
+        //요청에 쿠키가 포함되어 있지 않고 spring Security가 첫번째인 경우 요청은 사용자가 인증 되지
+        //않은 것으로 판단하고(요청에 쿠키가 없기때문에) 이를 거부한다.
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.setAllowedOrigins(Arrays.asList("**"));
+        corsConfiguration.setAllowedMethods(Arrays.asList("GET","POST"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", corsConfiguration);
+        return source;
+    }
 }

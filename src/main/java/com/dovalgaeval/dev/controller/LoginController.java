@@ -4,10 +4,7 @@ import com.dovalgaeval.dev.request.MemberCreate;
 import com.dovalgaeval.dev.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
@@ -34,7 +31,7 @@ public class LoginController {
      * @param mv
      * @return 로그인 페이지
      */
-    @GetMapping("/")
+    @GetMapping("/login")
     public ModelAndView index(ModelAndView mv){
         mv.setViewName("login");
         return mv;
@@ -57,14 +54,17 @@ public class LoginController {
      *
      * postRegister 회원가입
      *
-     * @param mv
+     * @param userName,password
      */
-    @PostMapping("/registerMember")
-    public ModelAndView postRegister(@RequestBody @Valid MemberCreate request,ModelAndView mv){
+    @PostMapping("/register")
+    public String postRegister(ModelAndView mv,@RequestParam String userName, @RequestParam String password){
+        MemberCreate request = MemberCreate.builder()
+                .userName(userName)
+                .password(password)
+                .build();
         memberService.save(request);
-        log.info("registerMember");
-        mv.setViewName("login");
-        return mv;
+        String msg = "회원가입 성공";
+        return msg;
     }
 
     @PostMapping("/login")
