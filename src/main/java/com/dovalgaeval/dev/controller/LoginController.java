@@ -54,17 +54,11 @@ public class LoginController {
      *
      * postRegister 회원가입
      *
-     * @param userName,password
+     * @param request
      */
     @PostMapping("/register")
-    public String postRegister(ModelAndView mv,@RequestParam String userName, @RequestParam String password){
-        MemberCreate request = MemberCreate.builder()
-                .userName(userName)
-                .password(password)
-                .build();
+    public void postRegister(@RequestBody @Valid MemberCreate request){
         memberService.save(request);
-        String msg = "회원가입 성공";
-        return msg;
     }
 
     @PostMapping("/login")

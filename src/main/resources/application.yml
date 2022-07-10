@@ -1,8 +1,30 @@
 spring:
   devtools:
+    remote:
+      restart:
+        enabled: true
     livereload:
       enabled: true
   thymeleaf:
     cache: false
     prefix: classpath:/templates/
     suffix: .html
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  datasource:
+    url: jdbc:h2:mem:dovalgaval
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  application:
+    name: secret_auth
+  config:
+    import: vault://
+  cloud:
+    vault:
+      uri: http://3.38.29.198:8200
+      token: hvs.CAESIJ1Ym7V_LheFFB73JOlvnk3tBUOVeznVZUYxpWiOy1YvGh4KHGh2cy5YWHlMaGU4Z092S1ptTzF2OHlyR290ZHk
+      kv:
+        default-context: secret_auth
