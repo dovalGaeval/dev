@@ -63,7 +63,7 @@
                     <p class="text-center small">Enter your username & password to login</p>
                   </div>
 
-                  <form class="row g-3 needs-validation" novalidate action="/login" method="post">
+                  <form class="row g-3 needs-validation" novalidate name="loginForm" action="/login" method="post">
 
 <!--                    <div class="col-12">-->
 <!--                      <label for="yourUsername" class="form-label">Username</label>-->
@@ -93,7 +93,7 @@
 <!--                      </div>-->
 <!--                    </div>-->
                     <div class="col-12">
-                      <button class="btn btn-primary w-100" type="submit">Login</button>
+                      <button class="btn btn-primary w-100" id="rBtn" type="submit">Login</button>
                     </div>
                     <div class="col-12">
                       <p class="small mb-0">Don't have account? <a href="/register">Create an account</a></p>
@@ -121,7 +121,6 @@
   </main><!-- End #main -->
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
   <!-- Vendor JS Files -->
   <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="/vendor/quill/quill.min.js"></script>
@@ -129,7 +128,11 @@
   <script src="/vendor/tinymce/tinymce.min.js"></script>
   <!-- Template Main JS File -->
   <script src="/js/main.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script th:inline="javascript">
 
+
+  </script>
 </body>
 
 </html>

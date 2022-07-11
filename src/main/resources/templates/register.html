@@ -64,7 +64,7 @@
                   </div>
 
                   <!-- 회원가입 폼 -->
-                  <form class="row g-3 needs-validation" novalidate id="registerForm">
+                  <form class="row g-3 needs-validation" novalidate name="registerForm" action="/register" method="post">
 <!--                    <div class="col-12">-->
 <!--                      <label for="yourName" class="form-label">Your Name</label>-->
 <!--                      <input type="text" name="name" class="form-control" id="yourName" required>-->
@@ -93,7 +93,7 @@
                     </div>
 
                     <div class="col-12">
-                      <button class="btn btn-primary w-100" id="submitId">Create Account</button>
+                      <button class="btn btn-primary w-100" id="rBtn" type="submit">Create Account</button>
                     </div>
                     <div class="col-12">
                       <p class="small mb-0">Already have an account? <a href="/">Log in</a></p>
@@ -130,23 +130,19 @@
   <!-- Template Main JS File -->
   <script src="/js/main.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
   <script th:inline="javascript">
-      $("#submitId").on("click",function(){
-
-         var data = {
-                "userName" : $("#userName").val(),
-                "password" : $("#password").val()
-         };
-
+      var form = $("form[name='registerForm']");
+      $("#rBtn").on("submit",function(e){
+          e.preventDefault();
+          var formData = form.serializeObject();
           $.ajax({
-            url: "/registerMember",
-            type: "post",
-            contentType: "application/json; charset=utf-8",
-<!--            data : JSON.stringify(data),-->
+            url: form.attr("action"),
+            type: "POST",
+            data : formData,
+            dataType : "text",
             success : function(data){
-                alert("회원가입 성공");
+                alert(data);
             },
             error : function(e,status){
                 console.log(e + " : " + status);

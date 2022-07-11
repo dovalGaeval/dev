@@ -25,6 +25,6 @@ spring:
   cloud:
     vault:
       uri: http://3.38.29.198:8200
-      token: hvs.CAESIJ1Ym7V_LheFFB73JOlvnk3tBUOVeznVZUYxpWiOy1YvGh4KHGh2cy5YWHlMaGU4Z092S1ptTzF2OHlyR290ZHk
+      token: hvs.CAESIOcANYVUDhK_dgU1UHiwLQQviTWoxSU6Vj8U5UMHTOIHGh4KHGh2cy5YSW93Y0lkZFc1VkI5TnR5ajNtaUZXZVY
       kv:
         default-context: secret_auth
