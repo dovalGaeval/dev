@@ -1,6 +1,6 @@
 package com.dovalgaeval.dev.component;
 
-import com.dovalgaeval.dev.exception.InvalidRequest;
+import com.dovalgaeval.dev.exception.ErrorCode;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -35,20 +35,20 @@ public class JwtTokenProvider {
      * @param token
      * @return true/false
      */
-    public boolean validateToken(String token) {
+    public boolean validateToken(String token,HttpServletRequest request) {
         try{
             Jwts.parser().setSigningKey(jwtKey).parseClaimsJws(token);
             return true;
         }catch (SignatureException e){
-            log.error("Invalid JWT signature","잘못된 jwt 서명");
+            request.setAttribute("exception", ErrorCode.INVALID_SIGNATURE.getStatueCode());
         }catch (MalformedJwtException e){
-            log.error("Invalid JWT token", "잘못된 jwt 토큰");
+            request.setAttribute("exception", ErrorCode.INVALID_TOKEN.getStatueCode());
         }catch (ExpiredJwtException e){
-            log.error("Expired JWT token","만료된 jwt 토큰");
+            request.setAttribute("exception", ErrorCode.EXPIRED_TOKEN.getStatueCode());
         }catch (UnsupportedJwtException e){
-            log.error("Unsupported JWT token","지원되지 않는 jwt 토큰");
+            request.setAttribute("exception", ErrorCode.UNSUPPORTED_TOKEN.getStatueCode());
         }catch (IllegalArgumentException e){
-            log.error("JWT claims string is empty");
+            request.setAttribute("exception", ErrorCode.UNKNOWN_TOKEN.getStatueCode());
         }
 
         return false;

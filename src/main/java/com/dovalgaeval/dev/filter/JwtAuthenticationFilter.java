@@ -1,6 +1,7 @@
 package com.dovalgaeval.dev.filter;
 
 import com.dovalgaeval.dev.component.JwtTokenProvider;
+import com.dovalgaeval.dev.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -45,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try{
             String jwt = jwtTokenProvider.getJwtFromRequest(request); //header로부터 bearer 토큰을 가져옴
-            if(StringUtils.isNotEmpty(jwt) && jwtTokenProvider.validateToken(jwt)){ //token 체크
+            if(StringUtils.isNotEmpty(jwt) && jwtTokenProvider.validateToken(jwt,request)){ //token 체크
                 String userName = jwtTokenProvider.getUserIdFromJWT(jwt);
 
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userName, null, null);
@@ -54,14 +55,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 //정상 토큰이면 토큰을 통해 생성한 Authentication 객체를 SecurityContext에 저장
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            }else{
-                if(StringUtils.isEmpty(jwt)){
-                    request.setAttribute("unauthorization","401 인증키 없음");
-                }
-
-                if(jwtTokenProvider.validateToken(jwt)){
-                    request.setAttribute("unauthorization","401-011 인증키 만료");
-                }
             }
         }catch (Exception e){
             SecurityContextHolder.clearContext();
