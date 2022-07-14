@@ -8,6 +8,7 @@ import com.dovalgaeval.dev.repository.MemberRepository;
 import com.dovalgaeval.dev.request.MemberCreate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -30,9 +31,7 @@ public class MemberService implements UserDetailsService {
     private final MemberRepository memberRepository;
     private final Encrypt encrypt;
     private final PasswordEncoder passwordEncoder;
-
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-
     private final JwtTokenProvider jwtTokenProvider;
 
 
@@ -68,15 +67,25 @@ public class MemberService implements UserDetailsService {
                 .role(Role.ROLE_USER).build();
     }
 
+    /**
+     *
+     * login 
+     *
+     * @param request 회원ID,password
+     * @return jwt 인증에 성공 jwt 발급
+     */
     public String login(MemberCreate request){
-        log.info("memberService login 시작");
         Member member = loadUserByUsername(request.getUserName());
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword(), null);
-        log.info("token : " ,token);
+
+        if(!passwordEncoder.matches(request.getPassword(), member.getPassword())){
+            throw new BadCredentialsException("비밀번호가 맞지않습니다.");
+        }
+
+        UsernamePasswordAuthenticationToken token =
+                new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword(), null);
 
         Authentication authenticate = authenticationManagerBuilder.getObject().authenticate(token);
         String jwt = jwtTokenProvider.createToken(authenticate);
-        log.info("jwt", jwt);
 
         return jwt;
     }

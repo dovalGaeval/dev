@@ -116,7 +116,7 @@ class LoginControllerTest {
 
     @Test
     @WithAnonymousUser
-    @DisplayName("인증되지 않은 객체가 로그인 했을때 로그인 페이지로 돌아가는지 확인")
+    @DisplayName("로그인시 비밀번호가 틀리면 발생하는 에러 확인")
     void unauthorizedTest() throws Exception {
         //given
         MemberCreate requestMember = MemberCreate.builder()
@@ -128,7 +128,7 @@ class LoginControllerTest {
 
         MemberCreate loginMember = MemberCreate.builder()
                 .userName("이메일")
-                .password("1236")
+                .password("12367890")
                 .build();
         String json = objectMapper.writeValueAsString(loginMember);
 
@@ -137,9 +137,9 @@ class LoginControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
                 )
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"))
+                .andExpect(status().isOk())
                 .andDo(print());
 
     }
+
 }
