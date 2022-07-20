@@ -8,6 +8,7 @@ import com.dovalgaeval.dev.repository.MemberRepository;
 import com.dovalgaeval.dev.request.MemberCreate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -16,6 +17,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
 *
@@ -74,12 +77,8 @@ public class MemberService implements UserDetailsService {
      * @param request 회원ID,password
      * @return jwt 인증에 성공 jwt 발급
      */
-    public String login(MemberCreate request){
+    public void login(MemberCreate request, HttpServletResponse response){
         Member member = loadUserByUsername(request.getUserName());
-
-        if(!passwordEncoder.matches(request.getPassword(), member.getPassword())){
-            throw new BadCredentialsException("비밀번호가 맞지않습니다.");
-        }
 
         UsernamePasswordAuthenticationToken token =
                 new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword(), null);
@@ -87,7 +86,8 @@ public class MemberService implements UserDetailsService {
         Authentication authenticate = authenticationManagerBuilder.getObject().authenticate(token);
         String jwt = jwtTokenProvider.createToken(authenticate);
 
-        return jwt;
+        response.setHeader("Authorization","Bearer " + jwt);
+
     }
     
 }

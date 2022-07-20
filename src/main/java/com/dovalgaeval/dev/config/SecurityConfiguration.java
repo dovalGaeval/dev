@@ -1,15 +1,13 @@
 package com.dovalgaeval.dev.config;
 
-import com.dovalgaeval.dev.component.JwtAccessHandler;
-import com.dovalgaeval.dev.component.JwtAuthenticationEntryPoint;
-import com.dovalgaeval.dev.component.JwtTokenProvider;
+import com.dovalgaeval.dev.component.*;
 import com.dovalgaeval.dev.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -23,8 +21,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 * @author LJH
 * 작성일 2022-06-30
 **/
-@Configuration
 @RequiredArgsConstructor
+@EnableWebSecurity
 public class SecurityConfiguration {
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -43,8 +41,6 @@ public class SecurityConfiguration {
     public BCryptPasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
-
-
 
     /**
      *
@@ -67,7 +63,6 @@ public class SecurityConfiguration {
             .loginPage("/")//spring Security에서 제공하는 로그인화면을 사용하지 않을 경우 사용
             .usernameParameter("userName") //spring Security에서는 파라미터로 username을 사용하는데 변경하고 싶을 때 사용
             .permitAll()
-                .defaultSuccessUrl("/boardList")
             .and().logout().permitAll()
             .and()
             .exceptionHandling()

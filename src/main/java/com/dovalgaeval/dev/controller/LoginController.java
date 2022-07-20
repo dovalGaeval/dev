@@ -61,9 +61,9 @@ public class LoginController {
         memberService.save(request);
     }
 
-    @PostMapping("/login")
-    public void login(@RequestBody @Valid MemberCreate request, HttpServletResponse response){
-        String jwt = memberService.login(request);
-        response.setHeader("Authorization","Bearer " + jwt);
-    }
+//    @PostMapping("/login")
+//    public void login(@RequestBody @Valid MemberCreate request, HttpServletResponse response){
+//        memberService.login(request,response);
+//
+//    }
 }
