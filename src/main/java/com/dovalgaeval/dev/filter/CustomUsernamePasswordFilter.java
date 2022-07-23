@@ -1,20 +1,12 @@
 package com.dovalgaeval.dev.filter;
 
-import com.dovalgaeval.dev.domain.Member;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 /**
  *
@@ -29,39 +21,21 @@ import java.io.IOException;
  * @author LJH
  * 작성일 2022-07-20
 **/
-@Slf4j
-@Component
-@RequiredArgsConstructor
 public class CustomUsernamePasswordFilter extends UsernamePasswordAuthenticationFilter {
-
-    private final AuthenticationManager authenticationManager;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
-        log.info("usernamePassword_filter");
-
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        Member member = null;
-
-        try {
-            member = objectMapper.readValue(request.getInputStream(), Member.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        String userName = request.getParameter("userName");
+        String password = request.getParameter("password");
 
         //usernamePassword token 생성
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(member.getUsername(), member.getPassword());
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userName, password);
 
         //authenticate() : 함수가 호출되면 인증 provider가 userDetailservice의
         //loadUserByUsername를 호출하고 UserDetails를 리턴받아서 토큰의 두번째 파라미터와 db값의 getPassword를 비교해서 동일하면 authentication 객체를 만들어서 필터체인으로 리턴해준다.
-        Authentication authenticate = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
-        log.info("Authentication : " + authenticate.getName());
+        Authentication authenticate = super.getAuthenticationManager().authenticate(usernamePasswordAuthenticationToken);
 
         return authenticate;
     }
-
-
-
 }

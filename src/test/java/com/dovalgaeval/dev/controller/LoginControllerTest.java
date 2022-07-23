@@ -19,7 +19,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -106,8 +107,9 @@ class LoginControllerTest {
 
         //expected
         mockMvc.perform(post("/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json)
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .param("userName","이메일")
+                        .param("password","1234")
                 )
                 .andExpect(status().isOk())
                 .andDo(print());
@@ -126,16 +128,11 @@ class LoginControllerTest {
 
         memberService.save(requestMember); //회원가입
 
-        MemberCreate loginMember = MemberCreate.builder()
-                .userName("이메일")
-                .password("12367890")
-                .build();
-        String json = objectMapper.writeValueAsString(loginMember);
-
         //expected
         mockMvc.perform(post("/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json)
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .param("userName","이메일")
+                        .param("password","1234512")
                 )
                 .andExpect(status().is4xxClientError())
                 .andDo(print());

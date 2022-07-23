@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-
 /**
 *
 * JwtAuthenticationEntryPoint : 인증과정에서 실패하거나 인증을 위한 헤더정보를 보내지 않은 경우

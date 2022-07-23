@@ -62,8 +62,7 @@ public class MemberService implements UserDetailsService {
      */
     @Override
     public Member loadUserByUsername(String username){
-        Member member = memberRepository.findByUserName(encrypt.encryptAES256(username))
-                .orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
+        Member member = memberRepository.findByUserName(encrypt.encryptAES256(username)).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
 
         return Member.builder().userName(encrypt.decryptAES256(member.getUsername()))
                 .password(member.getPassword())

@@ -1,6 +1,7 @@
 package com.dovalgaeval.dev.config;
 
 import com.dovalgaeval.dev.component.*;
+import com.dovalgaeval.dev.filter.CustomUsernamePasswordFilter;
 import com.dovalgaeval.dev.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -30,8 +31,13 @@ public class SecurityConfiguration {
     private final JwtAccessHandler jwtAccessHandler;
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public AuthenticationConfiguration authenticationConfiguration(){
+        return new AuthenticationConfiguration();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager() throws Exception {
+        return authenticationConfiguration().getAuthenticationManager();
     }
 
     /**
@@ -78,6 +84,17 @@ public class SecurityConfiguration {
     public WebSecurityCustomizer webSecurityCustomizer(){
         return (web) -> web.ignoring().antMatchers("/img/**","/css/**","/js/**","/vendor/**");
         //resources/static에 있는 파일들을 무시한다는 설정
+    }
+
+    /**
+     * CustomUsernamePasswordFilter를 bean으로 등록하고 authenticationManager와 CustomAuthenticationSuccessHandler를 적용해준다.
+     */
+    @Bean
+    public CustomUsernamePasswordFilter customUsernamePasswordFilter() throws Exception {
+        CustomUsernamePasswordFilter filter = new CustomUsernamePasswordFilter();
+        filter.setAuthenticationManager(authenticationManager());
+        filter.setAuthenticationSuccessHandler(new CustomAuthenticationSuccessHandler(jwtTokenProvider));
+        return filter;
     }
 
 }
